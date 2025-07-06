@@ -292,6 +292,30 @@ document.getElementById('fileInput').onchange = async (e) => {
   }, () => { showLoading(false); });
 };
 
+// Add a hidden audio element for default audio
+const defaultAudio = document.createElement('audio');
+defaultAudio.id = 'default-audio';
+defaultAudio.src = 'default.mp3'; // Place your default.mp3 in the project root
+defaultAudio.crossOrigin = 'anonymous';
+defaultAudio.style.display = 'none';
+document.body.appendChild(defaultAudio);
+
+// Add a button to play default audio
+const playDefaultBtn = document.createElement('button');
+playDefaultBtn.textContent = '▶ Play Default Audio';
+playDefaultBtn.style.marginLeft = '0.5em';
+playDefaultBtn.onclick = async () => {
+  showLoading(true);
+  if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+  defaultAudio.currentTime = 0;
+  defaultAudio.play();
+  const stream = defaultAudio.captureStream ? defaultAudio.captureStream() : defaultAudio.mozCaptureStream();
+  setupAudioNodes(stream);
+  showLoading(false);
+  animate();
+};
+document.getElementById('controls').appendChild(playDefaultBtn);
+
 // --- Loading Indicator ---
 const loadingDiv = document.createElement('div');
 loadingDiv.id = 'loading-indicator';
@@ -346,5 +370,12 @@ hideBtn.onclick = () => {
 };
 ui.style.transition = 'top 0.4s cubic-bezier(.7,0,.3,1)';
 ui.style.top = '0';
+
+// Update the UI header to be more futuristic and rename
+const uiHeader = document.querySelector('#ui h1');
+if (uiHeader) {
+  uiHeader.textContent = '';
+  uiHeader.innerHTML = `<span style="font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif; font-size:1.5em; letter-spacing:0.12em; color:#00fff7; text-shadow:0 0 12px #00fff7, 0 0 32px #0ffb;">HCI <span style='color:#fff;'>Audio Visual</span></span>`;
+}
 
 // ...more advanced features coming next...
